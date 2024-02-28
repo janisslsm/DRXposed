@@ -1,0 +1,55 @@
+# This is a basic workflow to help you get started with Actions
+name: CI
+
+# Controls when the workflow will run
+on: 
+  push:
+    branches: ["master"]
+  
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: gradle
+      
+      - name: Build Gradle
+        run: ./gradlew build
+
+      - name: Move APK to release directory
+        run: |
+          mkdir -p releases
+          mv app/build/outputs/apk/debug/app-debug.apk "releases/app-debug.apk"
+      
+      - name: Get some values needed for the release
+        id: release_values
+        run: |
+          echo "release_tag=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+      - name: Upload DevBuild as release
+        run: |
+          gh release upload devbuild --clobber releases/*
+          gh release edit devbuild --title "DevBuild $RELEASE_TAG"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ env.release_tag }}
+
+      - name: Finish
+        run: echo Finished!
