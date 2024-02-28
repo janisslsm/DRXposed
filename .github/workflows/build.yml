@@ -45,7 +45,6 @@ jobs:
 
       - name: Upload DevBuild as release
         run: |
-          gh release create devbuild releases/*
           gh release upload devbuild --clobber releases/*
           gh release edit devbuild --title "DevBuild $RELEASE_TAG"
         env:
