@@ -17,7 +17,7 @@
             android:value="42+" />
         <meta-data
             android:name="xposedscope"
-            android:value="com.gm_shaber.dayrpremium" />
+            android:value="com.gm_shaber.dayrpremium;app.dxv.mod;app.angel_mod.dayr" />
     </application>
 
 </manifest>

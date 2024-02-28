@@ -10,6 +10,7 @@ import java.io.File
 class MainHook : IXposedHookLoadPackage {
     private var drContext: Context? = null;
 
+    private val allowedPackages = listOf("com.gm_shaber.dayrpremium", "app.angel_mod.dayr", "app.dxv.mod")
 
     fun runFiles(files: Array<File>) {
         for (file in files) {
@@ -23,7 +24,7 @@ class MainHook : IXposedHookLoadPackage {
     }
 
     override fun handleLoadPackage(lpparam: XC_LoadPackage.LoadPackageParam) {
-        if (lpparam.packageName == "com.gm_shaber.dayrpremium") {
+        if (allowedPackages.contains(lpparam.packageName)) {
             try {
                 findAndHookMethod("android.content.ContextWrapper", lpparam.classLoader, "getApplicationContext", object : XC_MethodHook() {
                     @Throws(Throwable::class)
