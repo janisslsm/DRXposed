@@ -10,7 +10,15 @@ import java.io.File
 class MainHook : IXposedHookLoadPackage {
     private var drContext: Context? = null;
 
-    private val allowedPackages = listOf("com.gm_shaber.dayrpremium", "app.angel_mod.dayr", "app.dxv.mod")
+    // Add Original Game's package.name and some modded package.name
+    private val allowedPackages = listOf(
+        "com.gm_shaber.dayr",
+        "com.gm_shaber.dayrpremium", 
+        "app.angel_mod.dayr",
+        "app.angelmod.dayr",
+        "app.dxv_mod.dayr",
+        "app.dxvmod.dayr"
+    )
 
     fun runFiles(files: Array<File>) {
         for (file in files) {
