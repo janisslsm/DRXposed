@@ -30,7 +30,9 @@ int lua_gettop_hk(lua_State *L) {
 }
 
 void on_library_loaded(const char *name, void *handle) {
-    if (std::string(name).ends_with("liblua.so")) {
+    if(!name) return;
+
+    if (strstr(name, "liblua.so")) {
         glua_newthread = reinterpret_cast<decltype(glua_newthread)>(dlsym(handle, "lua_newthread"));
 
         o_gettop = dlsym(handle, "lua_gettop");
