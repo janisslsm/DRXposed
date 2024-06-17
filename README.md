@@ -1,36 +1,78 @@
 # DRXposed
-Xposed Module for Day R Survival.<br>
-Allows to execute custom script from external storage to the game.
+Xposed Module for game called **Day R Survival.**  
+This allows you to execute custom script from external storage *`(Internal  Storage)`* 
+to the game and modify how the game will behave by patching it on 
+initialization *(`Loading n%`)*.
+
 
 ## Installation
-Download the module and install it as normal.<br>
-To use the module you'll need to hooks this module using Xposed Module or LSPosed.
+> You'll need to have your phone rooted and have LSPosed or any similiar xpose module managers.
+1. Download the module [Here](https://github.com/janisslsm/DRXposed/releases).
+2. Install it.
+3. Open LSPosed, go to modules, then find `DRXposed`.
+4. Enable it, then open its settings
+5. Find the Day R Survival game that had these [package names](https://github.com/janisslsm/DRXposed/edit/master/README.md#supported-game-and-mods).
 
-## Scripts Installation
-All `scripts` must go to `/sdcard/Android/data/{package.name}/files/scripts/` and must ends with `.lua` extension. <br>
-For `{package.name}` refer to table below *(This is used to make the scripts usabled in different versions)*
+>*This module support official build of the game from play store, but the main purpose of this module was to create mod managers for the modded versions.*
 
-## Supported `package.name`
-| Package Name                | Game Name           | Variation                   |
-|-----------------------------|---------------------|-----------------------------|
-| `com.gm_shaber.dayr`        | Day R Survival      | Free Version (Original)     |
-| `com.gm_shaber.dayrpremium` | Day R Premium       | Paid Version (Original)     |
-| `app.angelmod.dayr`         | Day R Reimagine Dev | Development Build           |
-| `app.dxvmod.dayr`           | Day R DxV Dev       | Development Build           |
-| `app.angel_mod.dayr`        | Day R Reimagine Mod | Stable Build                |
-| `app.dxv_mod.dayr`          | Day R DxV Mod       | Stable Build                |
+## Supported Game and Mods
 
-_Example: `/sdcard/Android/data/com.gm_shaber.dayrpremium/files/scripts/some_script.lua`_
+|Package Name| Name | Type | Author |
+|--|--|--|--|
+| `com.gm_shaber.dayr` | Day R Survival | Official | TLTGames / Rmind |
+| `com.gm_shaber.dayrpremium` | Day R Premium | Official | TLTGames / Rmind |
+| `app.angel_mods.dayr` | Day R Reimagine | Modded | Angel |
+| `com.diexievie.dayr` | Day R DXV| Modded | Diexievie |
 
-## Example Scripts
-Example of a scripts to multiply items in inventory.
+## Adding Script
+
+There's a requirements to make your script used by the module.
+1. It must be placed in `/Android/data/{package.name}/files/scripts/`.
+2. It must ends with `.lua` extension.
+3. The DRXpose module must be enabled and targets the same app your scripts targets.
+
+
+> *For `{package.name}` refer to [package names](https://github.com/janisslsm/DRXposed/edit/master/README.md#supported-game-and-mods).*
+*Example: `/sdcard/Android/data/com.gm_shaber.dayrpremium/files/scripts/some_script.lua`*
+
+For this example we can make `item_multiplier.lua`
+The script will multiply all of our items amount 4 times from original value.
+But before that, you need to make **explicit** checks before the script runs, 
+since this script will be loaded the moment the module hooks to the game.
+> It's simply race with the game. It also can crash your game if there's no explicit checks.
+
+### Setup the checks.
 ```lua
--- item_multiplier.lua
-while not main.character:get("inventory") do
+while not(main and main.character and main.character:get("inventory")) do
+    wait(1)
+end
+```
+This checks will check if `main`, `main.character`, and `inventory` of our character does exist,
+if not, `wait` for 1 second and recheck again.
+> When the loop finds all, it continue to execute anything after it and exit.
+#### Code for the multiplier.
+```lua
+for index = 1, #main.character:get("inventory") do
+	local currentItemObject = main.character:get("inventory")[index];
+	currentItemObject[3] = currentItemObject[3] * 4
+end
+```
+This code, iterate every items in your inventory then 
+replace the key number `3`, which is the `amount` with `current_amount * 4` .
+
+> *Note: You can see the inner working of the game if you **made** a function that basically print to file the table the game uses, example such as **printToFile(main)*** 
+
+### Final Code of `item_multiplier.lua`
+```lua
+while not(main and main.character and main.character:get("inventory")) do
     wait(1)
 end
 
-for idx = 1, #main.character:get("inventory") do
-    main.character:get("inventory")[idx][3] = main.character:get("inventory")[idx][3] * 4
+for index = 1, #main.character:get("inventory") do
+	local currentItemObject = main.character:get("inventory")[index];
+	currentItemObject[3] = currentItemObject[3] * 4
 end
 ```
+> This code will runs every time the game launch, means you might have kkkkkkkk of items.
+> as of now, there's no such thing as Enable/Disable script, you can however make an if statement that never become true or just add **.bak** after **.lua** or replace the extension, also the module only read any lua file inside /files folder, if there's subfolder inside /files, it will ignore it *hopefully* (untested).
+
