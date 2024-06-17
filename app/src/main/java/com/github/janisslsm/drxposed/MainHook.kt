@@ -10,14 +10,22 @@ import java.io.File
 class MainHook : IXposedHookLoadPackage {
     private var drContext: Context? = null;
 
-    // Add Original Game's package.name and some modded package.name
+    /* 
+        Add Original Game's package.name and some modded package.name
+        Official Free and Premium
+        Angel and DXV Mods
+        and Lazy Clones made by MT Manager
+    */
+    
     private val allowedPackages = listOf(
         "com.gm_shaber.dayr",
-        "com.gm_shaber.dayrpremium", 
-        "app.angel_mod.dayr",
-        "app.angelmod.dayr",
-        "app.dxv_mod.dayr",
-        "app.dxvmod.dayr"
+        "com.gm_shaber.dayrpremium",
+        "app.angel_mods.dayr",
+        "app.angel_mods.dayr_dev",
+        "com.diexievie.dayr",
+        "com.diexievie.dayr_dev",
+        "com.gm_shaber.days",
+        "com.gm_shaber.dayrpremiun"
     )
 
     fun runFiles(files: Array<File>) {
@@ -41,11 +49,20 @@ class MainHook : IXposedHookLoadPackage {
                         if(drContext == null) {
                             drContext = applicationContext;
                             val scriptsDirectory = File("${drContext!!.getExternalFilesDir(null)}/scripts");
-                            if(!scriptsDirectory.exists())
-                                scriptsDirectory.mkdirs();
+                            if(!scriptsDirectory.exists()) scriptsDirectory.mkdirs();
+                            
+                            // added this line to replace the commented out line 55~
+                            scriptsDirectory.listFiles()?.let { runFiles(it) } 
                         }
                     }
                 })
+                
+                /*
+                // Had this Commented out because this patch runs after the game fully initialized
+                // If you wanted to patch important things such as Constants Value Ingame, 
+                // you need to patch it before the game finish loading (loads a profile as in continuing game)
+                // since this plugin is the last entry loaded after main.loading.loadProfile(profileID) fires
+                
                 findAndHookMethod("plugin.notifications.v2.LuaLoader", lpparam.classLoader, "invoke",
                     "com.naef.jnlua.LuaState",
                     object : XC_MethodHook() {
@@ -56,6 +73,7 @@ class MainHook : IXposedHookLoadPackage {
                             scriptsDirectory.listFiles()?.let { runFiles(it) }
                         }
                     })
+                */
                 System.loadLibrary("DRXposed")
 
             } catch (e: Throwable) {
