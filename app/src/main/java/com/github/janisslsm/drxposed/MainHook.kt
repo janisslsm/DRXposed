@@ -20,8 +20,8 @@ class MainHook : IXposedHookLoadPackage {
     private val allowedPackages = listOf(
         "com.gm_shaber.dayr",
         "com.gm_shaber.dayrpremium",
-        "app.angel_mods.dayr",
-        "app.angel_mods.dayr_dev",
+        "app.angelmod.dayr",
+        "app.angelmod.dayr_dev",
         "com.diexievie.dayr",
         "com.diexievie.dayr_dev",
         "com.gm_shaber.days",
@@ -49,13 +49,23 @@ class MainHook : IXposedHookLoadPackage {
                         if(drContext == null) {
                             drContext = applicationContext;
                             val scriptsDirectory = File("${drContext!!.getExternalFilesDir(null)}/scripts");
-                            if(!scriptsDirectory.exists()) scriptsDirectory.mkdirs();
-                            
-                            // added this line to replace the commented out line 55~
-                            scriptsDirectory.listFiles()?.let { runFiles(it) } 
+                            if(!scriptsDirectory.exists()) 
+                                scriptsDirectory.mkdirs();
                         }
                     }
                 })
+
+                // Help, idk what to find, hope it works
+                findAndHookMethod("com.naef.jnlua.LuaState", lpparam.classLoader, "invoke",
+                    "com.naef.jnlua.LuaState",
+                    object : XC_MethodHook() {
+                        override fun afterHookedMethod(param: MethodHookParam?) {
+                            val scriptsDirectory = File("${drContext!!.getExternalFilesDir(null)}/scripts");
+                            if(!scriptsDirectory.exists())
+                                scriptsDirectory.mkdirs();
+                            scriptsDirectory.listFiles()?.let { runFiles(it) }
+                        }
+                    })
                 
                 /*
                 // Had this Commented out because this patch runs after the game fully initialized
