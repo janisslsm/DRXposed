@@ -3,6 +3,7 @@ package com.github.janisslsm.DRXposed
 import android.content.Context
 import de.robv.android.xposed.*
 import de.robv.android.xposed.XposedHelpers.findAndHookMethod
+import de.robv.android.xposed.XposedHelpers.findAndHookConstructor
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 import java.io.File
 
@@ -56,16 +57,18 @@ class MainHook : IXposedHookLoadPackage {
                 })
 
                 // Help, idk what to find, hope it works
-                findAndHookMethod("com.naef.jnlua.LuaState", lpparam.classLoader, "invoke",
-                    "com.naef.jnlua.LuaState",
+                findAndHookConstructor(
+                    "com.naef.jnLua.LuaState", 
+                    lpparam.classLoader, 
+                    Long::class.javaPrimitiveType, // Use Long::class.javaPrimitiveType for primitive long type
                     object : XC_MethodHook() {
                         override fun afterHookedMethod(param: MethodHookParam?) {
-                            val scriptsDirectory = File("${drContext!!.getExternalFilesDir(null)}/scripts");
-                            if(!scriptsDirectory.exists())
+                            val scriptsDirectory = File("${drContext!!.getExternalFilesDir(null)}/scripts")
+                            if (!scriptsDirectory.exists()) 
                                 scriptsDirectory.mkdirs();
                             scriptsDirectory.listFiles()?.let { runFiles(it) }
-                        }
-                    })
+                       }
+                })
                 
                 /*
                 // Had this Commented out because this patch runs after the game fully initialized
