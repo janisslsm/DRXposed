@@ -58,7 +58,7 @@ class MainHook : IXposedHookLoadPackage {
 
                 // Help, idk what to find, hope it works
                 findAndHookConstructor(
-                    "com.naef.jnLua.LuaState", 
+                    "com.naef.jnlua.LuaState", 
                     lpparam.classLoader, 
                     Long::class.javaPrimitiveType, // Use Long::class.javaPrimitiveType for primitive long type
                     object : XC_MethodHook() {
