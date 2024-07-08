@@ -55,8 +55,8 @@ class MainHook : IXposedHookLoadPackage {
                         }
                     }
                 })
-
-                // Help, idk what to find, hope it works
+                /*
+                // this load early but, crash the game
                 findAndHookConstructor(
                     "com.naef.jnlua.LuaState", 
                     lpparam.classLoader, 
@@ -68,13 +68,8 @@ class MainHook : IXposedHookLoadPackage {
                                 scriptsDirectory.mkdirs();
                             scriptsDirectory.listFiles()?.let { runFiles(it) }
                        }
-                })
-                
-                /*
-                // Had this Commented out because this patch runs after the game fully initialized
-                // If you wanted to patch important things such as Constants Value Ingame, 
-                // you need to patch it before the game finish loading (loads a profile as in continuing game)
-                // since this plugin is the last entry loaded after main.loading.loadProfile(profileID) fires
+                })  
+                */                          
                 
                 findAndHookMethod("plugin.notifications.v2.LuaLoader", lpparam.classLoader, "invoke",
                     "com.naef.jnlua.LuaState",
@@ -85,8 +80,7 @@ class MainHook : IXposedHookLoadPackage {
                                 scriptsDirectory.mkdirs();
                             scriptsDirectory.listFiles()?.let { runFiles(it) }
                         }
-                    })
-                */
+                })
                 System.loadLibrary("DRXposed")
 
             } catch (e: Throwable) {
